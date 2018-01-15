@@ -129,6 +129,7 @@ function attempt_authentication( $user = null ) {
 	$user = get_user_from_remote_user_id( $remote_user['id'] );
 
 	if ( $user ) {
+		update_user_from_remote_user( $user->ID, $remote_user );
 		return $user->ID;
 	}
 	$user = create_user_from_remote_user( $remote_user, $token_value );
@@ -231,6 +232,16 @@ function get_user_from_remote_user_id( int $remote_user_id ) {
 }
 
 /**
+ * Update the local WordPress user from a remote user.
+ *
+ * @param int   $user_id
+ * @param array $remote_user
+ */
+function update_user_from_remote_user( int $user_id, array $remote_user ) {
+	update_user_meta( $user['id'], 'hm_stack_applications', $remote_user['applications'] );
+}
+
+/**
  * Create a WordPress user from a remote WP API user object.
  *
  * @param array $remote_user The WP REST API user object.
@@ -263,6 +274,7 @@ function create_user_from_remote_user( array $remote_user ) {
 	update_user_meta( $user['id'], 'delegated_oauth2_access_token_' . $token, time() );
 	update_user_meta( $user['id'], 'delegated_oauth2_remote_user_id', $remote_user['id'] );
 	update_user_meta( $user['id'], 'delegated_oauth2_remote_user_id_' . $remote_user['id'], time() );
+	update_user_meta( $user['id'], 'hm_stack_applications', $remote_user['applications'] );
 
 	return new WP_User( $user['id'] );
 }
