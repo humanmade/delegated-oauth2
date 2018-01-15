@@ -238,7 +238,7 @@ function get_user_from_remote_user_id( int $remote_user_id ) {
  * @param array $remote_user
  */
 function update_user_from_remote_user( int $user_id, array $remote_user ) {
-	update_user_meta( $user['id'], 'hm_stack_applications', $remote_user['applications'] );
+	update_user_meta( $user_id, 'hm_stack_applications', $remote_user['applications'] );
 }
 
 /**
