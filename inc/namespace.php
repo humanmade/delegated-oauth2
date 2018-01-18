@@ -257,7 +257,7 @@ function update_user_from_remote_user( int $user_id, array $remote_user ) {
 	$request = new WP_REST_Request( 'POST', '/wp/v2/users/' . $user_id );
 
 	$body = $remote_user;
-	unset( $body['id'] );
+	$body['id'] = $user_id;
 	$request->set_body_params( $body );
 	$user = $controller->update_item( $request );
 
