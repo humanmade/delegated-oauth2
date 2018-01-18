@@ -126,21 +126,25 @@ function attempt_authentication( $user = null ) {
 		$delegated_oauth2_error = $remote_user;
 		return $user;
 	}
-	$user = get_user_from_remote_user_id( $remote_user['id'] );
+	$local_user = get_user_from_remote_user_id( $remote_user['id'] );
 
-	if ( $user ) {
-		update_user_from_remote_user( $user->ID, $remote_user );
-		return $user->ID;
+	if ( $local_user ) {
+		$update = update_user_from_remote_user( $local_user->ID, $remote_user );
+		if ( is_wp_error( $update ) ) {
+			$delegated_oauth2_error = $update;
+			return $user;
+		}
+		return $local_user->ID;
 	}
-	$user = create_user_from_remote_user( $remote_user, $token_value );
+	$local_user = create_user_from_remote_user( $remote_user, $token_value );
 
-	if ( is_wp_error( $user ) ) {
-		$delegated_oauth2_error = $user;
+	if ( is_wp_error( $local_user ) ) {
+		$delegated_oauth2_error = $local_user;
 		return $user;
 	}
 
 	$is_querying_token = false;
-	return $user->ID;
+	return $local_user->ID;
 }
 
 /**
@@ -239,6 +243,29 @@ function get_user_from_remote_user_id( int $remote_user_id ) {
  */
 function update_user_from_remote_user( int $user_id, array $remote_user ) {
 	update_user_meta( $user_id, 'hm_stack_applications', $remote_user['applications'] );
+
+	// As we are hooking early into WordPress, not all globals may have been set up yet.
+	if ( empty( $GLOBALS['wp_rewrite'] ) ) {
+		$GLOBALS['wp_rewrite'] = new WP_Rewrite;
+		$GLOBALS['wp_rewrite']->init();
+	}
+	wp_roles();
+
+	// Rather than using rest_do_request() (which requires a user already be authenicated)
+	// we use the controller directly.
+	$controller = new WP_REST_Users_Controller;
+	$request = new WP_REST_Request( 'POST', '/wp/v2/users/' . $user_id );
+
+	$body = $remote_user;
+	unset( $body['id'] );
+	$request->set_body_params( $body );
+	$user = $controller->update_item( $request );
+
+	if ( is_wp_error( $user ) ) {
+		return $user;
+	}
+
+	return true;
 }
 
 /**
@@ -247,7 +274,7 @@ function update_user_from_remote_user( int $user_id, array $remote_user ) {
  * @param array $remote_user The WP REST API user object.
  * @return WP_Error|WP_User
  */
-function create_user_from_remote_user( array $remote_user ) {
+function create_user_from_remote_user( array $remote_user, $token ) {
 	// As we are hooking early into WordPress, not all globals may have been set up yet.
 	if ( empty( $GLOBALS['wp_rewrite'] ) ) {
 		$GLOBALS['wp_rewrite'] = new WP_Rewrite;
