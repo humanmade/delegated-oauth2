@@ -191,7 +191,7 @@ function create_invalid_token_error( $token ) {
  * @return array | WP_Error
  */
 function get_remote_user_for_token( string $token ) {
-	$response = wp_remote_get( trailingslashit( HM_DELEGATED_OAUTH2_REST_BASE ) . 'wp/v2/users/me?context=edit', [
+	$response = wp_remote_get( trailingslashit( HM_DELEGATED_OAUTH2_REST_BASE ) . 'wp/v2/users/me?context=edit&_t=' . time(), [
 		'headers' => [
 			'Authorization' => "Bearer $token",
 			'Accept'        => 'application/json',
@@ -243,7 +243,15 @@ function get_user_from_remote_user_id( int $remote_user_id ) {
  */
 function update_user_from_remote_user( int $user_id, array $remote_user ) {
 	update_user_meta( $user_id, 'hm_stack_applications', $remote_user['applications'] );
+	$user = new WP_User( $user_id );
 
+	if (
+		$user->user_email === $remote_user['email'] &&
+		$user->roles === $remote_user['user'] &&
+		$user->display_name === $remote_user['name']
+	) {
+		return true;
+	}
 	// As we are hooking early into WordPress, not all globals may have been set up yet.
 	if ( empty( $GLOBALS['wp_rewrite'] ) ) {
 		$GLOBALS['wp_rewrite'] = new WP_Rewrite;
