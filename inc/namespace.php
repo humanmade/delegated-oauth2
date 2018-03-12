@@ -247,7 +247,7 @@ function update_user_from_remote_user( int $user_id, array $remote_user ) {
 
 	if (
 		$user->user_email === $remote_user['email'] &&
-		$user->roles === $remote_user['user'] &&
+		$user->roles === $remote_user['roles'] &&
 		$user->display_name === $remote_user['name']
 	) {
 		return true;
