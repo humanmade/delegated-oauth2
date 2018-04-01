@@ -31,10 +31,10 @@ function on_load() {
 
 function on_auth_callback( string $code ) {
 	$args = [
-		'client_id' => HM_DELEGATED_AUTH_CLIENT_ID,
-		'redirect_uri' => 'http://localhost:3300/hm-delegated-auth-callback',
-		'grant_type' => 'authorization_code',
-		'code' => $code,
+		'client_id'    => HM_DELEGATED_AUTH_CLIENT_ID,
+		'redirect_uri' => home_url( '/hm-delegated-auth-callback' ),
+		'grant_type'   => 'authorization_code',
+		'code'         => $code,
 	];
 	$response = wp_remote_post( HM_DELEGATED_AUTH_REST_BASE . 'oauth2/access_token', [
 		'body' => $args,
