@@ -17,7 +17,7 @@ function on_login_form() : void {
 	<?php
 }
 
-function on_load() {
+function on_load() : void {
 	if ( wp_parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) !== '/hm-delegated-auth-callback' ) {
 		return;
 	}
