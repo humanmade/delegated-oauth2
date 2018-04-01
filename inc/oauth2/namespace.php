@@ -2,9 +2,9 @@
 
 namespace HM\Delegated_Auth\OAuth2;
 
+use function HM\Delegated_Auth\synchronize_user_for_token;
 use WP_Error;
 use WP_Http;
-use function HM\Delegated_Auth\synchronize_user_for_token;
 
 /**
  * Get the authorization header

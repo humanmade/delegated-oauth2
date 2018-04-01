@@ -2,8 +2,8 @@
 
 namespace HM\Delegated_Auth\Cookie;
 
-use WP_Error;
 use function HM\Delegated_Auth\synchronize_user_for_token;
+use WP_Error;
 
 function is_enabled() : bool {
 	return defined( 'HM_DELEGATED_AUTH_CLIENT_ID' );
