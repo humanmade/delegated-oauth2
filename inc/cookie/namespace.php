@@ -45,8 +45,11 @@ function on_auth_callback( string $code ) {
 
 	$body = json_decode( wp_remote_retrieve_body( $response ), true );
 
+	if ( json_last_error() !== JSON_ERROR_NONE ) {
+		return new WP_Error( 'invalid-json', sprintf( 'Unable to parse JSON from response, due to error %s.', json_last_error_msg() ) );
+	}
 	if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
-		return new WP_Error( 'invalid-access-token', sprintf( 'Invalid access token, recieved %s (%s)', $body['message'], $body['code'] ) );
+		return new WP_Error( 'invalid-access-token', sprintf( 'Invalid access token, received %s (%s)', $body['message'], $body['code'] ) );
 	}
 
 	$local_user = synchronize_user_for_token( $body['access_token'] );
