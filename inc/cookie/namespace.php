@@ -62,7 +62,7 @@ function on_auth_callback( string $code ) {
 function get_authorize_url() : string {
 	$authorise_url = HM_DELEGATED_AUTH_REST_BASE . 'oauth2/authorize';
 	$args = [
-		'client_id'     => 'euenqgeudkvs',
+		'client_id'     => HM_DELEGATED_AUTH_CLIENT_ID,
 		'redirect_uri'  => home_url( '/hm-delegated-auth-callback' ),
 		'response_type' => 'code',
 	];
