@@ -7,7 +7,6 @@ use WP_REST_Request;
 use WP_REST_Users_Controller;
 use WP_Rewrite;
 use WP_User;
-use WP_Http;
 
 /**
  * Remove fetch the user for a given token.

@@ -3,10 +3,6 @@
 namespace HM\Delegated_Auth\OAuth2;
 
 use WP_Error;
-use WP_REST_Request;
-use WP_REST_Users_Controller;
-use WP_Rewrite;
-use WP_User;
 use WP_Http;
 use function HM\Delegated_Auth\synchronize_user_for_token;
 
