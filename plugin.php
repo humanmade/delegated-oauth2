@@ -1,19 +1,19 @@
 <?php
 
 /**
- * Plugin Name: Delegated OAuth 2 Authentication
- * Description: Delegate authentication to another OAuth 2 WordPres site.
+ * Plugin Name: Delegated Authentication
+ * Description: Delegate authentication to another OAuth 2 WordPress site.
  * Author: Joe Hoyle
  */
-
-namespace HM\Delegated_OAuth2;
+namespace HM\Delegated_Auth;
 
 require_once __DIR__ . '/inc/namespace.php';
+require_once __DIR__ . '/inc/oauth2/namespace.php';
 
-if ( ! defined( 'HM_DELEGATED_OAUTH2_REST_BASE' ) ) {
+if ( ! defined( 'HM_DELEGATED_AUTH_REST_BASE' ) ) {
 	return;
 }
-add_filter( 'determine_current_user', __NAMESPACE__ . '\\attempt_authentication', 11 );
-add_filter( 'rest_authentication_errors', __NAMESPACE__ . '\\maybe_report_errors' );
 
+add_filter( 'determine_current_user', __NAMESPACE__ . '\\OAuth2\\attempt_authentication', 11 );
+add_filter( 'rest_authentication_errors', __NAMESPACE__ . '\\OAuth2\\maybe_report_errors' );
 
