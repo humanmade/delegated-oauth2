@@ -5,6 +5,11 @@ namespace HM\Delegated_Auth\Cookie;
 use function HM\Delegated_Auth\synchronize_user_for_token;
 use WP_Error;
 
+/**
+ * Check if the plugin is enabled
+ *
+ * Setup for the plugin requires HM_DELEGATED_AUTH_CLIENT_ID be defined.
+ */
 function is_enabled() : bool {
 	return defined( 'HM_DELEGATED_AUTH_CLIENT_ID' );
 }
@@ -17,18 +22,31 @@ function on_login_form() : void {
 	<?php
 }
 
+/**
+ * Load hook to check for the oauth2 redirect request.
+ */
 function on_load() : void {
 	if ( wp_parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) !== '/hm-delegated-auth-callback' ) {
 		return;
 	}
 
 	$code = sanitize_text_field( $_GET['code'] );
-	$auth = on_auth_callback( $code );
-	if ( is_wp_error( $auth ) ) {
-		wp_die( $auth->get_error_message() );
+	$auth_user = on_auth_callback( $code );
+	if ( is_wp_error( $auth_user ) ) {
+		wp_die( $auth_user );
+	} else {
+		wp_set_auth_cookie( $auth_user->ID, false );
+		wp_safe_redirect( admin_url() );
+		exit;
 	}
 }
 
+/**
+ * Handle the oauth2 redirect_url request.
+ *
+ * @param  string           $code The oauth2 response code
+ * @return WP_Error|WP_User
+ */
 function on_auth_callback( string $code ) {
 	$args = [
 		'client_id'    => HM_DELEGATED_AUTH_CLIENT_ID,
@@ -57,11 +75,12 @@ function on_auth_callback( string $code ) {
 		return $local_user;
 	}
 
-	wp_set_auth_cookie( $local_user->ID, false );
-	wp_safe_redirect( admin_url() );
-	exit;
+	return $local_user;
 }
 
+/**
+ * Get the authorize URL to be used as the redirect_uri in the oauth2 flow.
+ */
 function get_authorize_url() : string {
 	$authorise_url = HM_DELEGATED_AUTH_REST_BASE . 'oauth2/authorize';
 	$args = [
@@ -92,8 +111,10 @@ function attempt_authentication( $user = null ) {
 		return $user;
 	}
 	$local_user = synchronize_user_for_token( $token );
+	$is_querying_token = false;
+
 	if ( is_wp_error( $local_user ) ) {
-		wp_die( $local_user->get_error_message() );
+		wp_die( $local_user );
 	}
 
 	return $local_user->ID;
