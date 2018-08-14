@@ -34,11 +34,10 @@ function on_load() : void {
 	$auth_user = on_auth_callback( $code );
 	if ( is_wp_error( $auth_user ) ) {
 		wp_die( $auth_user );
-	} else {
-		wp_set_auth_cookie( $auth_user->ID, false );
-		wp_safe_redirect( admin_url() );
-		exit;
 	}
+	wp_set_auth_cookie( $auth_user->ID, false );
+	wp_safe_redirect( admin_url() );
+	exit;
 }
 
 /**
@@ -71,9 +70,6 @@ function on_auth_callback( string $code ) {
 	}
 
 	$local_user = synchronize_user_for_token( $body['access_token'] );
-	if ( is_wp_error( $local_user ) ) {
-		return $local_user;
-	}
 
 	return $local_user;
 }
