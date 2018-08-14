@@ -79,7 +79,7 @@ function get_token_from_request() {
 		return null;
 	}
 
-	$token = $_GET['access_token'];
+	$token = wp_unslash( $_GET['access_token'] );
 	if ( is_string( $token ) ) {
 		return $token;
 	}
