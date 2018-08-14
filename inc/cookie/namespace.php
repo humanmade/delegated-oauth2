@@ -18,7 +18,7 @@ function is_enabled() : bool {
  */
 function on_login_form() : void {
 	?>
-	<p><a href="<?php echo esc_url( get_authorize_url() ); ?>">Login with Delegated Auth</a></p>
+	<p><a href="<?php echo esc_url( get_authorize_url() ); ?>">Log In with Delegated Auth</a></p>
 	<?php
 }
 
