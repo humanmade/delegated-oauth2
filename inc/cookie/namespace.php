@@ -16,7 +16,7 @@ function is_enabled() : bool {
 /**
  * Login page footer for the login link.
  */
-function on_login_form() : void {
+function on_login_form() {
 	?>
 	<p><a href="<?php echo esc_url( get_authorize_url() ); ?>">Log In with Delegated Auth</a></p>
 	<?php
@@ -25,7 +25,7 @@ function on_login_form() : void {
 /**
  * Load hook to check for the oauth2 redirect request.
  */
-function on_load() : void {
+function on_load() {
 	if ( wp_parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) !== '/hm-delegated-auth-callback' ) {
 		return;
 	}
