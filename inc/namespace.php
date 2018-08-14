@@ -158,7 +158,7 @@ function synchronize_user_for_token( string $token ) {
 	if ( $local_user ) {
 		$update = update_user_from_remote_user( $local_user->ID, $remote_user );
 		if ( is_wp_error( $update ) ) {
-			return $user;
+			return $update;
 		}
 		return $local_user;
 	}

@@ -104,6 +104,7 @@ function attempt_authentication( $user = null ) {
 
 	$token = get_user_meta( $user, 'delegated_oauth2_access_token', true );
 	if ( ! $token ) {
+		$is_querying_token = false;
 		return $user;
 	}
 	$local_user = synchronize_user_for_token( $token );
