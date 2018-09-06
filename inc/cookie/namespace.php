@@ -5,6 +5,8 @@ namespace HM\Delegated_Auth\Cookie;
 use function HM\Delegated_Auth\synchronize_user_for_token;
 use WP_Error;
 
+defined( 'HM_DELEGATED_AUTH_LOGIN_TEXT' ) or define( 'HM_DELEGATED_AUTH_LOGIN_TEXT', 'Log In with Delegated Auth' );
+
 /**
  * Check if the plugin is enabled
  *
@@ -18,7 +20,7 @@ function is_enabled() : bool {
  */
 function on_login_form() {
 	?>
-	<p><a href="<?php echo esc_url( get_authorize_url() ); ?>">Log In with Delegated Auth</a></p>
+	<p><a href="<?php echo esc_url( get_authorize_url() ); ?>"><?php echo esc_html( HM_DELEGATED_AUTH_LOGIN_TEXT ); ?></a></p>
 	<?php
 }
 
