@@ -19,9 +19,10 @@ function is_enabled() : bool {
  * Login page footer for the login link.
  */
 function on_login_form() {
-	?>
-	<p><a href="<?php echo esc_url( get_authorize_url() ); ?>"><?php echo esc_html( HM_DELEGATED_AUTH_LOGIN_TEXT ); ?></a></p>
-	<?php
+	if ( defined( 'HM_DELEGATED_AUTH_LOGIN_TEXT' ) && is_string( HM_DELEGATED_AUTH_LOGIN_TEXT ) ) { ?>
+		<p><a href="<?php echo esc_url( get_authorize_url() ); ?>"><?php echo esc_html( HM_DELEGATED_AUTH_LOGIN_TEXT ); ?></a></p>
+		<?php
+	}
 }
 
 /**
