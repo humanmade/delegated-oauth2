@@ -5,6 +5,7 @@ namespace HM\Delegated_Auth\OAuth2;
 use function HM\Delegated_Auth\synchronize_user_for_token;
 use WP_Error;
 use WP_Http;
+use WP_User;
 
 /**
  * Get the authorization header
@@ -118,11 +119,27 @@ function attempt_authentication( $user = null ) {
 
 	$is_querying_token = true;
 
-	$local_user = synchronize_user_for_token( $token_value );
-	if ( is_wp_error( $local_user ) ) {
-		$delegated_auth_error = $local_user;
-		return $user;
+	// Locally cache the user for the given access token if it is enabled.
+	if ( defined( 'HM_DELEGATED_AUTH_ACCESS_TOKEN_CACHE_TTL' ) ) {
+		$cached_id = wp_cache_get( $token_value, 'local_user_id_for_token' );
+		if ( $cached_id ) {
+			$local_user = new WP_User( $cached_id );
+		} else {
+			$local_user = synchronize_user_for_token( $token_value );
+			if ( is_wp_error( $local_user ) ) {
+				$delegated_auth_error = $local_user;
+				return $user;
+			}
+			wp_cache_set( $token_value, $local_user->ID, 'local_user_id_for_token', HM_DELEGATED_AUTH_ACCESS_TOKEN_CACHE_TTL );
+		}
+	} else {
+		$local_user = synchronize_user_for_token( $token_value );
+		if ( is_wp_error( $local_user ) ) {
+			$delegated_auth_error = $local_user;
+			return $user;
+		}
 	}
+
 
 	return $local_user->ID;
 }
