@@ -4,6 +4,7 @@
  * Plugin Name: Delegated Authentication
  * Description: Delegate authentication to another OAuth 2 WordPress site.
  * Author: Joe Hoyle
+ * Version: 1.0.0
  */
 namespace HM\Delegated_Auth;
 
