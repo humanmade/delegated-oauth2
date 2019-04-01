@@ -1,0 +1,12 @@
+{
+	"name": "humanmade/delegated-oauth",
+	"description": "Delegate OAuth 2 authorization to another WordPress site",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
+	"authors": [
+		{
+			"name": "Human Made",
+			"email": "hello@humanmade.com"
+		}
+	]
+}
