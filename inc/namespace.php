@@ -71,10 +71,11 @@ function get_user_from_remote_user_id( int $remote_user_id ) {
 function update_user_from_remote_user( int $user_id, array $remote_user ) {
 	update_user_meta( $user_id, 'hm_stack_applications', $remote_user['applications'] );
 	$user = new WP_User( $user_id );
+	$sync_role = apply_filters( 'delegated_oauth.sync-roles', true );
 
 	if (
 		$user->user_email === $remote_user['email'] &&
-		$user->roles === $remote_user['roles'] &&
+		( ( $sync_role && $user->roles === $remote_user['roles'] ) || ! $sync_role ) &&
 		$user->display_name === $remote_user['name']
 	) {
 		return true;
@@ -94,9 +95,8 @@ function update_user_from_remote_user( int $user_id, array $remote_user ) {
 	$body = $remote_user;
 	$body['id'] = $user_id;
 
-	$sync_role = apply_filters( 'delegated_oauth.sync-roles', true );
 	if ( ! $sync_role ) {
-		unset( $body['role'] );
+		unset( $body['roles'] );
 	}
 	$request->set_body_params( $body );
 	$user = $controller->update_item( $request );
@@ -131,7 +131,7 @@ function create_user_from_remote_user( array $remote_user, $token ) {
 	unset( $body['id'] );
 	$sync_role = apply_filters( 'delegated_oauth.sync-roles', true );
 	if ( ! $sync_role ) {
-		unset( $body['role'] );
+		unset( $body['roles'] );
 	}
 	$request->set_body_params( $body );
 	$user = $controller->create_item( $request );
