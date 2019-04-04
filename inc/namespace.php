@@ -93,6 +93,11 @@ function update_user_from_remote_user( int $user_id, array $remote_user ) {
 
 	$body = $remote_user;
 	$body['id'] = $user_id;
+
+	$sync_role = apply_filters( 'delegated_oauth.sync-roles', true );
+	if ( ! $sync_role ) {
+		unset( $body['role'] );
+	}
 	$request->set_body_params( $body );
 	$user = $controller->update_item( $request );
 
@@ -117,13 +122,17 @@ function create_user_from_remote_user( array $remote_user, $token ) {
 	}
 	wp_roles();
 
-	// Rather than using rest_do_request() (which requires a user already be authenicated)
+	// Rather than using rest_do_request() (which requires a user already be authenticated)
 	// we use the controller directly.
 	$controller = new WP_REST_Users_Controller;
 	$request = new WP_REST_Request( 'POST', '/wp/v2/users' );
 
 	$body = $remote_user;
 	unset( $body['id'] );
+	$sync_role = apply_filters( 'delegated_oauth.sync-roles', true );
+	if ( ! $sync_role ) {
+		unset( $body['role'] );
+	}
 	$request->set_body_params( $body );
 	$user = $controller->create_item( $request );
 
