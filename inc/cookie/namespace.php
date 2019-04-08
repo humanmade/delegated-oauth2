@@ -87,6 +87,11 @@ function get_authorize_url() : string {
 		'redirect_uri'  => home_url( '/hm-delegated-auth-callback' ),
 		'response_type' => 'code',
 	];
+
+	if ( is_multisite() ) {
+		$args['redirect_uri'] = add_query_arg( 'site', get_current_blog_id(), network_home_url( '/hm-delegated-auth-callback' ) );
+	}
+
 	return add_query_arg( $args, $authorise_url );
 }
 
