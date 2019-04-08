@@ -7,3 +7,5 @@ When a login request is delegated to the upstream WordPress site a local cache o
 ## Configuring Cookie Auth
 
 For Cookie auth to work correctly you must create an OAuth 2 application on the upstream WordPress site. Do so using the `home_url( '/hm-delegated-auth-callback' )` as the Callback URL, and configure this plugin with the Client ID in the PHP constant `HM_DELEGATED_AUTH_CLIENT_ID`.
+
+Note that if you are using multisite, this must use the home URL for the main site so that the callback URL is the same for the whole network. Delegated Auth then redirects internally between sites as necessary.
