@@ -33,6 +33,19 @@ function on_load() {
 		return;
 	}
 
+	if ( is_multisite() && isset( $_GET['site'] ) ) {
+		// Find the site's callback.
+		$site = absint( $_GET['site'] );
+		$url = get_home_url( $site, '/hm-delegated-auth-callback' );
+
+		// Add query arguments to the redirect.
+		wp_parse_str( $_SERVER['QUERY_STRING'], $args );
+		$with_args = remove_query_arg( 'site', add_query_arg( $args, $url ) );
+
+		wp_redirect( $with_args );
+		exit;
+	}
+
 	$code = sanitize_text_field( $_GET['code'] );
 	$auth_user = on_auth_callback( $code );
 	if ( is_wp_error( $auth_user ) ) {
