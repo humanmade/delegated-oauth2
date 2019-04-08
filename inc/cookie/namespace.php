@@ -29,7 +29,9 @@ function on_login_form() {
  * Load hook to check for the oauth2 redirect request.
  */
 function on_load() {
-	if ( wp_parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) !== '/hm-delegated-auth-callback' ) {
+	$home_path = wp_parse_url( home_url(), PHP_URL_PATH );
+	$req_path = wp_parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
+	if ( substr( $req_path, strlen( $home_path ) ) !== '/hm-delegated-auth-callback' ) {
 		return;
 	}
 
