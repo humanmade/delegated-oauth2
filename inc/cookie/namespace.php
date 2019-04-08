@@ -38,6 +38,11 @@ function on_load() {
 	if ( is_multisite() && isset( $_GET['site'] ) ) {
 		// Find the site's callback.
 		$site = absint( $_GET['site'] );
+		$site_data = get_site( $site );
+		if ( empty( $site_data ) ) {
+			return;
+		}
+
 		$url = get_home_url( $site, '/hm-delegated-auth-callback' );
 
 		// Add query arguments to the redirect.
