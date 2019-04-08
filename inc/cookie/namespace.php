@@ -47,7 +47,7 @@ function on_load() {
 
 		// Add query arguments to the redirect.
 		wp_parse_str( $_SERVER['QUERY_STRING'], $args );
-		$with_args = remove_query_arg( 'site', add_query_arg( $args, $url ) );
+		$with_args = remove_query_arg( 'site', add_query_arg( urlencode_deep( $args ), $url ) );
 
 		wp_redirect( $with_args );
 		exit;
