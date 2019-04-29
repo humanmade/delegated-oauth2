@@ -20,7 +20,7 @@ function is_enabled() : bool {
  */
 function on_login_form() {
 	if ( defined( 'HM_DELEGATED_AUTH_LOGIN_TEXT' ) && is_string( HM_DELEGATED_AUTH_LOGIN_TEXT ) ) { ?>
-		<p><a href="<?php echo esc_url( get_authorize_url() ); ?>"><?php echo esc_html( HM_DELEGATED_AUTH_LOGIN_TEXT ); ?></a></p>
+		<p style="margin-bottom: 16px;"><a href="<?php echo esc_url( get_authorize_url() ); ?>"><?php echo esc_html( HM_DELEGATED_AUTH_LOGIN_TEXT ); ?></a></p>
 		<?php
 	}
 }
