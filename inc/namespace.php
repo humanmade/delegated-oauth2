@@ -175,5 +175,13 @@ function synchronize_user_for_token( string $token ) {
 		return $local_user;
 	}
 
+	/**
+	 * Fires when a user is synchronized from a remote REST API user.
+	 *
+	 * @param WP_User $local_user  The local user object.
+	 * @param array   $remote_user The remote user data object, from the WP REST API.
+	 */
+	do_action( 'delegated_oauth.sync_user', $local_user, $remote_user, $token );
+
 	return $local_user;
 }
