@@ -140,7 +140,6 @@ function attempt_authentication( $user = null ) {
 		}
 	}
 
-
 	return $local_user->ID;
 }
 
