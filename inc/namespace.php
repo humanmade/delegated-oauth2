@@ -167,6 +167,16 @@ function synchronize_user_for_token( string $token ) {
 		if ( is_wp_error( $update ) ) {
 			return $update;
 		}
+
+		/**
+		 * Fires when a user is synchronized from a remote REST API user.
+		 *
+		 * @param WP_User $local_user  The local user object.
+		 * @param array   $remote_user The remote user data object, from the WP REST API.
+		 * @param boolean $is_update   Is this an update?
+		 */
+		do_action( 'delegated_oauth.sync_user', $local_user, $remote_user, $token, true );
+
 		return $local_user;
 	}
 	$local_user = create_user_from_remote_user( $remote_user, $token );
@@ -175,13 +185,8 @@ function synchronize_user_for_token( string $token ) {
 		return $local_user;
 	}
 
-	/**
-	 * Fires when a user is synchronized from a remote REST API user.
-	 *
-	 * @param WP_User $local_user  The local user object.
-	 * @param array   $remote_user The remote user data object, from the WP REST API.
-	 */
-	do_action( 'delegated_oauth.sync_user', $local_user, $remote_user, $token );
+	/** This action is documented above. */
+	do_action( 'delegated_oauth.sync_user', $local_user, $remote_user, $token, false );
 
 	return $local_user;
 }
