@@ -47,6 +47,7 @@ function get_remote_user_for_token( string $token ) {
 function get_user_from_remote_user_id( int $remote_user_id ) {
 	$users = get_users( [
 		'limit' => 1,
+		'blog_id' => 0,
 		'meta_query' => [
 			[
 				'key'     => "delegated_oauth2_remote_user_id_{$remote_user_id}",
