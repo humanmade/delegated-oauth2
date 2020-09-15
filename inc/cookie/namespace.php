@@ -29,8 +29,28 @@ function on_login_form() {
  * Load hook to check for the oauth2 redirect request.
  */
 function on_load() {
-	if ( wp_parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) !== '/hm-delegated-auth-callback' ) {
+	$home_path = wp_parse_url( home_url(), PHP_URL_PATH );
+	$req_path = wp_parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
+	if ( substr( $req_path, strlen( $home_path ) ) !== '/hm-delegated-auth-callback' ) {
 		return;
+	}
+
+	if ( is_multisite() && isset( $_GET['site'] ) ) {
+		// Find the site's callback.
+		$site = absint( $_GET['site'] );
+		$site_data = get_site( $site );
+		if ( empty( $site_data ) ) {
+			return;
+		}
+
+		$url = get_home_url( $site, '/hm-delegated-auth-callback' );
+
+		// Add query arguments to the redirect.
+		wp_parse_str( $_SERVER['QUERY_STRING'], $args );
+		$with_args = remove_query_arg( 'site', add_query_arg( urlencode_deep( $args ), $url ) );
+
+		wp_redirect( $with_args );
+		exit;
 	}
 
 	$code = sanitize_text_field( $_GET['code'] );
@@ -87,7 +107,12 @@ function get_authorize_url() : string {
 		'redirect_uri'  => home_url( '/hm-delegated-auth-callback' ),
 		'response_type' => 'code',
 	];
-	return add_query_arg( $args, $authorise_url );
+
+	if ( is_multisite() ) {
+		$args['redirect_uri'] = add_query_arg( 'site', get_current_blog_id(), network_home_url( '/hm-delegated-auth-callback' ) );
+	}
+
+	return add_query_arg( urlencode_deep( $args ), $authorise_url );
 }
 
 /**

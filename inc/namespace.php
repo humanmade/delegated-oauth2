@@ -69,12 +69,12 @@ function get_user_from_remote_user_id( int $remote_user_id ) {
  * @param array $remote_user
  */
 function update_user_from_remote_user( int $user_id, array $remote_user ) {
-	update_user_meta( $user_id, 'hm_stack_applications', $remote_user['applications'] );
 	$user = new WP_User( $user_id );
+	$sync_role = apply_filters( 'delegated_oauth.sync-roles', true );
 
 	if (
 		$user->user_email === $remote_user['email'] &&
-		$user->roles === $remote_user['roles'] &&
+		( ( $sync_role && $user->roles === $remote_user['roles'] ) || ! $sync_role ) &&
 		$user->display_name === $remote_user['name']
 	) {
 		return true;
@@ -93,6 +93,10 @@ function update_user_from_remote_user( int $user_id, array $remote_user ) {
 
 	$body = $remote_user;
 	$body['id'] = $user_id;
+
+	if ( ! $sync_role ) {
+		unset( $body['roles'] );
+	}
 	$request->set_body_params( $body );
 	$user = $controller->update_item( $request );
 
@@ -117,13 +121,17 @@ function create_user_from_remote_user( array $remote_user, $token ) {
 	}
 	wp_roles();
 
-	// Rather than using rest_do_request() (which requires a user already be authenicated)
+	// Rather than using rest_do_request() (which requires a user already be authenticated)
 	// we use the controller directly.
 	$controller = new WP_REST_Users_Controller;
 	$request = new WP_REST_Request( 'POST', '/wp/v2/users' );
 
 	$body = $remote_user;
 	unset( $body['id'] );
+	$sync_role = apply_filters( 'delegated_oauth.sync-roles', true );
+	if ( ! $sync_role ) {
+		unset( $body['roles'] );
+	}
 	$request->set_body_params( $body );
 	$user = $controller->create_item( $request );
 
@@ -136,7 +144,6 @@ function create_user_from_remote_user( array $remote_user, $token ) {
 	update_user_meta( $user['id'], 'delegated_oauth2_access_token_' . $token, time() );
 	update_user_meta( $user['id'], 'delegated_oauth2_remote_user_id', $remote_user['id'] );
 	update_user_meta( $user['id'], 'delegated_oauth2_remote_user_id_' . $remote_user['id'], time() );
-	update_user_meta( $user['id'], 'hm_stack_applications', $remote_user['applications'] );
 
 	return new WP_User( $user['id'] );
 }
@@ -160,6 +167,16 @@ function synchronize_user_for_token( string $token ) {
 		if ( is_wp_error( $update ) ) {
 			return $update;
 		}
+
+		/**
+		 * Fires when a user is synchronized from a remote REST API user.
+		 *
+		 * @param WP_User $local_user  The local user object.
+		 * @param array   $remote_user The remote user data object, from the WP REST API.
+		 * @param boolean $is_update   Is this an update?
+		 */
+		do_action( 'delegated_oauth.sync_user', $local_user, $remote_user, $token, true );
+
 		return $local_user;
 	}
 	$local_user = create_user_from_remote_user( $remote_user, $token );
@@ -167,6 +184,9 @@ function synchronize_user_for_token( string $token ) {
 	if ( is_wp_error( $local_user ) ) {
 		return $local_user;
 	}
+
+	/** This action is documented above. */
+	do_action( 'delegated_oauth.sync_user', $local_user, $remote_user, $token, false );
 
 	return $local_user;
 }
