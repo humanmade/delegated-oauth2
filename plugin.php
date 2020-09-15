@@ -16,8 +16,7 @@ if ( ! defined( 'HM_DELEGATED_AUTH_REST_BASE' ) ) {
 	return;
 }
 
-add_filter( 'determine_current_user', __NAMESPACE__ . '\\OAuth2\\attempt_authentication', 11 );
-add_filter( 'rest_authentication_errors', __NAMESPACE__ . '\\OAuth2\\maybe_report_errors' );
+OAuth2\bootstrap();
 
 if ( Cookie\is_enabled() ) {
 	add_filter( 'determine_current_user', __NAMESPACE__ . '\\Cookie\\attempt_authentication', 11 );

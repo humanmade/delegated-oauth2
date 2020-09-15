@@ -7,6 +7,17 @@ use WP_Error;
 use WP_Http;
 use WP_User;
 
+const ACCESS_TOKEN_CACHE_GROUP = 'cache-users-for-access-token';
+
+/**
+ * Bootstrapp the OAuth 2 adaptor.
+ */
+function bootstrap() {
+	add_filter( 'determine_current_user', __NAMESPACE__ . '\\attempt_authentication', 11 );
+	add_filter( 'rest_authentication_errors', __NAMESPACE__ . '\\maybe_report_errors' );
+	wp_cache_add_global_groups( ACCESS_TOKEN_CACHE_GROUP );
+}
+
 /**
  * Get the authorization header
  *
@@ -121,7 +132,7 @@ function attempt_authentication( $user = null ) {
 
 	// Locally cache the user for the given access token if it is enabled.
 	if ( defined( 'HM_DELEGATED_AUTH_ACCESS_TOKEN_CACHE_TTL' ) ) {
-		$cached_id = wp_cache_get( $token_value, 'local_user_id_for_token' );
+		$cached_id = wp_cache_get( $token_value, ACCESS_TOKEN_CACHE_GROUP );
 		if ( $cached_id ) {
 			$local_user = new WP_User( $cached_id );
 		} else {
@@ -130,14 +141,15 @@ function attempt_authentication( $user = null ) {
 				$delegated_auth_error = $local_user;
 				return $user;
 			}
-			wp_cache_set( $token_value, $local_user->ID, 'local_user_id_for_token', HM_DELEGATED_AUTH_ACCESS_TOKEN_CACHE_TTL );
+			wp_cache_set( $token_value, $local_user->ID, ACCESS_TOKEN_CACHE_GROUP, HM_DELEGATED_AUTH_ACCESS_TOKEN_CACHE_TTL );
 		}
-	} else {
-		$local_user = synchronize_user_for_token( $token_value );
-		if ( is_wp_error( $local_user ) ) {
-			$delegated_auth_error = $local_user;
-			return $user;
-		}
+		return $local_user->ID;
+	}
+
+	$local_user = synchronize_user_for_token( $token_value );
+	if ( is_wp_error( $local_user ) ) {
+		$delegated_auth_error = $local_user;
+		return $user;
 	}
 
 	return $local_user->ID;
