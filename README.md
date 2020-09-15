@@ -12,7 +12,7 @@ Note that if you are using multisite, this must use the home URL for the main si
 
 ## Caching Access Token Authentication
 
-Check the upstream WordPress site on each HTTP request to validate the OAuth 2 access token can cause significant load. Delegated Auth support locally caching the access token validation for a short period of time, so not every request causes an upstream HTTP request. To enable this functionality, define the `HM_DELEGATED_AUTH_ACCESS_TOKEN_CACHE_TTL` constant with an integer value in seconds. For example, to cache Access Token validation for 60 seconds:
+Checking the upstream WordPress site on each HTTP request to validate the OAuth 2 access token can cause significant load. Delegated Auth supports locally caching the access token validation for a short period of time, so not every request causes an upstream HTTP request. To enable this functionality, define the `HM_DELEGATED_AUTH_ACCESS_TOKEN_CACHE_TTL` constant with an integer value in seconds. For example, to cache Access Token validation for 60 seconds:
 
 ```php
 define( 'HM_DELEGATED_AUTH_ACCESS_TOKEN_CACHE_TTL', 60 );
