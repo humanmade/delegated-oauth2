@@ -10,7 +10,7 @@ use WP_User;
 const ACCESS_TOKEN_CACHE_GROUP = 'cache-users-for-access-token';
 
 /**
- * Bootstrapp the OAuth 2 adaptor.
+ * Bootstrap the OAuth 2 adaptor.
  */
 function bootstrap() {
 	add_filter( 'determine_current_user', __NAMESPACE__ . '\\attempt_authentication', 11 );
