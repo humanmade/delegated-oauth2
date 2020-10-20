@@ -19,8 +19,12 @@ function is_enabled() : bool {
  * Login page footer for the login link.
  */
 function on_login_form() {
+	$login_url = get_authorize_url();
+	if ( isset( $_GET['redirect_to'] ) ) {
+		$login_url = add_query_arg( 'redirect_to', esc_url_raw( $_GET['redirect_to'] ), $login_url );
+	}
 	if ( defined( 'HM_DELEGATED_AUTH_LOGIN_TEXT' ) && is_string( HM_DELEGATED_AUTH_LOGIN_TEXT ) ) { ?>
-		<p><a href="<?php echo esc_url( get_authorize_url() ); ?>"><?php echo esc_html( HM_DELEGATED_AUTH_LOGIN_TEXT ); ?></a></p>
+		<p><a href="<?php echo esc_url( $login_url ); ?>"><?php echo esc_html( HM_DELEGATED_AUTH_LOGIN_TEXT ); ?></a></p>
 		<?php
 	}
 }
@@ -59,7 +63,13 @@ function on_load() {
 		wp_die( $auth_user );
 	}
 	wp_set_auth_cookie( $auth_user->ID, false );
-	wp_safe_redirect( admin_url() );
+
+	if ( isset( $_GET['redirect_to'] ) ) {
+		$redirect_url = esc_url_raw( $_GET['redirect_to'] );
+	} else {
+		$redirect_url = admin_url();
+	}
+	wp_safe_redirect( $redirect_url );
 	exit;
 }
 
