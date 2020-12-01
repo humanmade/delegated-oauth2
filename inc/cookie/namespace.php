@@ -19,10 +19,11 @@ function is_enabled() : bool {
  * Login page footer for the login link.
  */
 function on_login_form() {
-	$login_url = get_authorize_url();
+	$redirect_uri_params = [];
 	if ( isset( $_GET['redirect_to'] ) ) {
-		$login_url = add_query_arg( 'redirect_to', esc_url_raw( $_GET['redirect_to'] ), $login_url );
+		$redirect_uri_params['redirect_to'] = esc_url_raw( $_GET['redirect_to'] );
 	}
+	$login_url = get_authorize_url( $redirect_uri_params );
 	if ( defined( 'HM_DELEGATED_AUTH_LOGIN_TEXT' ) && is_string( HM_DELEGATED_AUTH_LOGIN_TEXT ) ) { ?>
 		<p><a href="<?php echo esc_url( $login_url ); ?>"><?php echo esc_html( HM_DELEGATED_AUTH_LOGIN_TEXT ); ?></a></p>
 		<?php
@@ -109,8 +110,11 @@ function on_auth_callback( string $code ) {
 
 /**
  * Get the authorize URL to be used as the redirect_uri in the oauth2 flow.
+ *
+ * @param array $redirect_params Map of additional params to add to the redirect_uri.
+ * @return string
  */
-function get_authorize_url() : string {
+function get_authorize_url( array $redirect_params = [] ) : string {
 	$authorise_url = HM_DELEGATED_AUTH_REST_BASE . 'oauth2/authorize';
 	$args = [
 		'client_id'     => HM_DELEGATED_AUTH_CLIENT_ID,
@@ -120,6 +124,10 @@ function get_authorize_url() : string {
 
 	if ( is_multisite() ) {
 		$args['redirect_uri'] = add_query_arg( 'site', get_current_blog_id(), network_home_url( '/hm-delegated-auth-callback' ) );
+	}
+
+	if ( $redirect_params ) {
+		$args['redirect_uri'] = add_query_arg( $redirect_params, $args['redirect_uri'] );
 	}
 
 	return add_query_arg( urlencode_deep( $args ), $authorise_url );
