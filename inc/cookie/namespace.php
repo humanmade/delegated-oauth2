@@ -25,7 +25,8 @@ function on_login_form() {
 	}
 	$login_url = get_authorize_url( $redirect_uri_params );
 	if ( defined( 'HM_DELEGATED_AUTH_LOGIN_TEXT' ) && is_string( HM_DELEGATED_AUTH_LOGIN_TEXT ) ) {
-		$format = apply_filters( 'delegated-oauth2.login.button_markup', '<p><a href="%1$s">%2$s</a></p>' );
+		$format = apply_filters( 'delegated_oauth.login.button_markup', '<p><a href="%1$s">%2$s</a></p>' );
+		// phpcs:ignore HM.Security.EscapeOutput.OutputNotEscaped
 		printf(
 			$format,
 			esc_url( $login_url ),
