@@ -24,9 +24,14 @@ function on_login_form() {
 		$redirect_uri_params['redirect_to'] = esc_url_raw( $_GET['redirect_to'] );
 	}
 	$login_url = get_authorize_url( $redirect_uri_params );
-	if ( defined( 'HM_DELEGATED_AUTH_LOGIN_TEXT' ) && is_string( HM_DELEGATED_AUTH_LOGIN_TEXT ) ) { ?>
-		<p><a href="<?php echo esc_url( $login_url ); ?>"><?php echo esc_html( HM_DELEGATED_AUTH_LOGIN_TEXT ); ?></a></p>
-		<?php
+	if ( defined( 'HM_DELEGATED_AUTH_LOGIN_TEXT' ) && is_string( HM_DELEGATED_AUTH_LOGIN_TEXT ) ) {
+		$format = apply_filters( 'delegated_oauth.login.button_markup', '<p><a href="%1$s">%2$s</a></p>' );
+		// phpcs:ignore HM.Security.EscapeOutput.OutputNotEscaped
+		printf(
+			$format,
+			esc_url( $login_url ),
+			esc_html( HM_DELEGATED_AUTH_LOGIN_TEXT )
+		);
 	}
 }
 
