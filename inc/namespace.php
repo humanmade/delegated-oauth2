@@ -129,6 +129,12 @@ function create_user_from_remote_user( array $remote_user, $token ) {
 
 	$body = $remote_user;
 	unset( $body['id'] );
+
+	// Don't try sync the persisted_preferences meta as this causes the request to fail.
+	if ( isset( $body['meta']['persisted_preferences'] ) ) {
+		unset( $body['meta']['persisted_preferences'] );
+	}
+
 	$sync_role = apply_filters( 'delegated_oauth.sync-roles', true );
 	if ( ! $sync_role ) {
 		unset( $body['roles'] );
